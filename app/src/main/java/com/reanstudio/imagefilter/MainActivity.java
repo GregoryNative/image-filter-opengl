@@ -26,13 +26,18 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        glSurfaceView.onResume();
+        if (glSurfaceView != null) {
+            glSurfaceView.onResume();
+        }
+
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        glSurfaceView.onPause();
+        if (glSurfaceView != null) {
+            glSurfaceView.onPause();
+        }
     }
 
     private void initialize() {
@@ -42,9 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (hasGLES20()) {
             glView = new GLSurfaceView(this);
-            glView.setEGLContextClientVersion(2);
-            glView.setPreserveEGLContextOnPause(true);
-            glView.setRenderer(new GLES20Renderer());
+            glView.setRenderer(new OpenGLRenderer());
         } else {
             // device not supported
         }
