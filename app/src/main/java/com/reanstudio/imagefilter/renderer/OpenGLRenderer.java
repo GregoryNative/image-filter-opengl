@@ -1,7 +1,11 @@
-package com.reanstudio.imagefilter;
+package com.reanstudio.imagefilter.renderer;
 
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
+
+import com.reanstudio.imagefilter.shape.FlatColoredSquare;
+import com.reanstudio.imagefilter.shape.SmoothColoringSquare;
+import com.reanstudio.imagefilter.shape.Square;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -13,10 +17,16 @@ public class OpenGLRenderer implements GLSurfaceView.Renderer {
 
     private Square square;
 
+    private FlatColoredSquare flatColoredSquare;
+
+    private SmoothColoringSquare smoothColoringSquare;
+
     private float angle;
 
     public OpenGLRenderer() {
         this.square = new Square();
+        this.flatColoredSquare = new FlatColoredSquare();
+        this.smoothColoringSquare = new SmoothColoringSquare();
     }
 
     @Override
@@ -67,7 +77,7 @@ public class OpenGLRenderer implements GLSurfaceView.Renderer {
         // Rotate square A counter-clockwise
         gl.glRotatef(angle, 0, 0, 1);
         // Draw square A.
-        square.draw(gl);
+        flatColoredSquare.draw(gl);
         // Restore the last matrix
         gl.glPopMatrix();
 
@@ -76,12 +86,12 @@ public class OpenGLRenderer implements GLSurfaceView.Renderer {
         gl.glPushMatrix();
         // Rotate square B before moving it, making it rotate around A
         gl.glRotatef(-angle, 0, 0, 1);
-        // Move square B
-        gl.glTranslatef(2, 0, 0);
         // Scale it to 50% of square A
         gl.glScalef(.5f, .5f, .5f);
+        // Translate to end up under the flat square
+        gl.glTranslatef(1, -3f, -1f);
         // Draw square B.
-        square.draw(gl);
+        smoothColoringSquare.draw(gl);
 
         // Square C
         // Save the current matrix

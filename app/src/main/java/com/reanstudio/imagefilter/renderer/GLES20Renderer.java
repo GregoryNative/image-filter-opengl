@@ -1,4 +1,4 @@
-package com.reanstudio.imagefilter;
+package com.reanstudio.imagefilter.renderer;
 
 import android.opengl.GLES20;
 

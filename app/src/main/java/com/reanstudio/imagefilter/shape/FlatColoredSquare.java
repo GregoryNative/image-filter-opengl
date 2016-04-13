@@ -1,4 +1,4 @@
-package com.reanstudio.imagefilter;
+package com.reanstudio.imagefilter.shape;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -11,7 +11,7 @@ import javax.microedition.khronos.opengles.GL10;
 /**
  * Created by yahyamukhlis on 4/12/16.
  */
-public class Square {
+public class FlatColoredSquare {
     // Our vertices
     private float vertices[] = {
         -1.0f, 1.0f, 0.0f, // 0, Top Left
@@ -29,7 +29,7 @@ public class Square {
     // Our index buffer
     private ShortBuffer indexBuffer;
 
-    public Square() {
+    public FlatColoredSquare() {
         // a float is 4 bytes, therefore we multiply the number if vertices with 4
         ByteBuffer vbb = ByteBuffer.allocateDirect(vertices.length * 4);
         vbb.order(ByteOrder.nativeOrder());
@@ -46,6 +46,7 @@ public class Square {
     }
 
     public void draw(GL10 gl10) {
+        gl10.glColor4f(0.5f, 0.5f, 1.0f, 1.0f);
         // Counter-clockwise winding
         gl10.glFrontFace(GL10.GL_CCW);
         // Enable face culling

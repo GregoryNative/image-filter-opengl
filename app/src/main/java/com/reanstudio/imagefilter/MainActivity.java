@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.reanstudio.imagefilter.renderer.OpenGLRenderer;
+
 public class MainActivity extends AppCompatActivity {
 
     private GLSurfaceView glSurfaceView;
