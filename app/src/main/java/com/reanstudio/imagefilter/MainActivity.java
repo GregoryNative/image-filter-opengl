@@ -3,14 +3,15 @@ package com.reanstudio.imagefilter;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.ConfigurationInfo;
+import android.graphics.BitmapFactory;
 import android.opengl.GLSurfaceView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.reanstudio.imagefilter.mesh.SimplePlane;
 import com.reanstudio.imagefilter.renderer.MeshRenderer;
-import com.reanstudio.imagefilter.renderer.OpenGLRenderer;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -51,7 +52,17 @@ public class MainActivity extends AppCompatActivity {
         if (hasGLES20()) {
             glView = new GLSurfaceView(this);
 //            glView.setRenderer(new OpenGLRenderer());
-            glView.setRenderer(new MeshRenderer());
+//            glView.setRenderer(new MeshRenderer());
+            MeshRenderer meshRenderer = new MeshRenderer();
+
+            SimplePlane simplePlane = new SimplePlane();
+            simplePlane.z = 1.7f;
+            simplePlane.rx = -65;
+            simplePlane.loadBitmap(BitmapFactory.decodeResource(getResources(),
+                    R.drawable.jay));
+            meshRenderer.addMesh(simplePlane);
+            glView.setRenderer(meshRenderer);
+
         } else {
             // device not supported
         }

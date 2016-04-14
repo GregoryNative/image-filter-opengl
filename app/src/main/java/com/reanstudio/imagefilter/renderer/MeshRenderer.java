@@ -7,6 +7,7 @@ import com.reanstudio.imagefilter.mesh.Cube;
 import com.reanstudio.imagefilter.mesh.Group;
 import com.reanstudio.imagefilter.mesh.Mesh;
 import com.reanstudio.imagefilter.mesh.Plane;
+import com.reanstudio.imagefilter.mesh.SimplePlane;
 import com.reanstudio.imagefilter.shape.FlatColoredSquare;
 import com.reanstudio.imagefilter.shape.SmoothColoringSquare;
 import com.reanstudio.imagefilter.shape.Square;
@@ -19,14 +20,14 @@ import javax.microedition.khronos.opengles.GL10;
  */
 public class MeshRenderer implements GLSurfaceView.Renderer {
 
-    private Mesh root;
+    private Group root;
 
     public MeshRenderer() {
         Group group = new Group();
-        Cube cube = new Cube(1, 1, 1);
-        cube.rx = 45;
-        cube.ry = 45;
-        group.add(cube);
+//        Cube cube = new Cube(1, 1, 1);
+//        cube.rx = 45;
+//        cube.ry = 45;
+//        group.add(cube);
         root = group;
     }
 
@@ -70,8 +71,12 @@ public class MeshRenderer implements GLSurfaceView.Renderer {
         // Replace the current matrix with the identity matrix
         gl.glLoadIdentity();
         // Translates 4 units into the screen.
-        gl.glTranslatef(0, 0, -10);
+        gl.glTranslatef(0, 0, -4);
 
         root.draw(gl);
+    }
+
+    public void addMesh(Mesh mesh) {
+        root.add(mesh);
     }
 }

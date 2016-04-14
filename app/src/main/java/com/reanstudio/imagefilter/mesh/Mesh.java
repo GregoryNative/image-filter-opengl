@@ -1,5 +1,8 @@
 package com.reanstudio.imagefilter.mesh;
 
+import android.graphics.Bitmap;
+import android.opengl.GLUtils;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -37,6 +40,18 @@ public class Mesh {
     public float ry = 0;
     public float rz = 0;
 
+    // Our UV texture buffer
+    private FloatBuffer textureBuffer;
+
+    // Our texture id
+    private int textureId = -1;
+
+    // The bitmap we want to load as a texture
+    private Bitmap bitmap;
+
+    private boolean shouldLoadTexture = false;
+
+
     public void draw(GL10 gl) {
         // Counter-clockwise winding
         gl.glFrontFace(GL10.GL_CCW);
@@ -50,6 +65,7 @@ public class Mesh {
         gl.glVertexPointer(3, GL10.GL_FLOAT, 0, verticesBuffer);
         // Set flat color
         gl.glColor4f(rgba[0], rgba[1], rgba[2], rgba[3]);
+
         // Smooth color
         if (colorBuffer != null) {
             // Enable the color array buffer to be used during rendering
@@ -57,6 +73,22 @@ public class Mesh {
             // Point out the where the color buffer is
             gl.glColorPointer(4, GL10.GL_FLOAT, 0, colorBuffer);
         }
+
+        if (shouldLoadTexture) {
+            loadGLTexture(gl);
+            shouldLoadTexture = false;
+        }
+
+        if (textureId != -1 && textureBuffer != null) {
+            gl.glEnable(GL10.GL_TEXTURE_2D);
+            // Enable the texture state
+            gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+
+            // Point to our buffers
+            gl.glTexCoordPointer(2, GL10.GL_FLOAT, 0, textureBuffer);
+            gl.glBindTexture(GL10.GL_TEXTURE_2D, textureId);
+        }
+
         gl.glTranslatef(x, y, z);
         gl.glRotatef(rx, 1, 0, 0);
         gl.glRotatef(ry, 0, 1, 0);
@@ -68,6 +100,10 @@ public class Mesh {
         gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
         // Disable face culling
         gl.glDisable(GL10.GL_CULL_FACE);
+
+        if (textureId != -1 && textureBuffer != null) {
+            gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+        }
     }
 
     protected void setVertices(float[] vertices) {
@@ -106,5 +142,39 @@ public class Mesh {
         colorBuffer.position(0);
     }
 
+    protected void setTextureCoordinates(float[] textureCoordinates) {
+        // float is 4 bytes, therefore we multiply the number if vertices with 4
+        ByteBuffer byteBuffer = ByteBuffer.allocateDirect(textureCoordinates.length * 4);
+        byteBuffer.order(ByteOrder.nativeOrder());
+        textureBuffer = byteBuffer.asFloatBuffer();
+        textureBuffer.put(textureCoordinates);
+        textureBuffer.position(0);
+    }
+
+    public void loadBitmap(Bitmap bitmap) {
+        this.bitmap = bitmap;
+        shouldLoadTexture = true;
+    }
+
+    private void loadGLTexture(GL10 gl) {
+        // Generate one texture pointer
+        int[] textures = new int[1];
+        gl.glGenTextures(1, textures, 0);
+        textureId = textures[0];
+
+        // bind to array
+        gl.glBindTexture(GL10.GL_TEXTURE_2D, textureId);
+
+        // Created nearest filter texture
+        gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
+        gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR);
+
+        // Different possible texture parameters, e.g. GL10.GL_CLAMP_TO_EDGE
+        gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S, GL10.GL_REPEAT);
+        gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T, GL10.GL_REPEAT);
+
+        // Use android GLUtils to specify a two-dimensional texture image from our bitmap
+        GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0);
+    }
 }
 
