@@ -3,7 +3,6 @@ package com.reanstudio.imagefilter.renderer;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Rect;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
@@ -11,6 +10,7 @@ import android.opengl.Matrix;
 import android.view.MotionEvent;
 
 import com.reanstudio.imagefilter.shader.ReinierGraphicTools;
+import com.reanstudio.imagefilter.shape.Sprite;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -46,7 +46,8 @@ public class ReinierGLRenderer implements GLSurfaceView.Renderer {
     private long lastTime;
     private int program;
 
-    public Rect rect;
+//    public Rect rect;
+    public Sprite sprite;
 
     public ReinierGLRenderer(Context context) {
         this.context = context;
@@ -136,6 +137,7 @@ public class ReinierGLRenderer implements GLSurfaceView.Renderer {
         long elapsed = now - lastTime;
 
         // Update our example
+        updateSprite();
 
         // Render our example
         draw(trxProjectionAndView);
@@ -191,19 +193,21 @@ public class ReinierGLRenderer implements GLSurfaceView.Renderer {
 
     public void setupTriangle() {
         // Initial rect
-        rect = new Rect();
-        rect.left = 10;
-        rect.right = 100;
-        rect.bottom = 100;
-        rect.top = 200;
+//        rect = new Rect();
+//        rect.left = 10;
+//        rect.right = 100;
+//        rect.bottom = 100;
+//        rect.top = 200;
+        sprite = new Sprite();
+        vertices = sprite.getTransformedVertices();
 
         // We have to create the vertices of our triangle.
-        vertices = new float[] {
-            10.0f, 200f, 0.0f,
-            10.0f, 100f, 0.0f,
-            100f, 100f, 0.0f,
-            100f, 200f, 0.0f,
-        };
+//        vertices = new float[] {
+//            10.0f, 200f, 0.0f,
+//            10.0f, 100f, 0.0f,
+//            100f, 100f, 0.0f,
+//            100f, 200f, 0.0f,
+//        };
 
         indices = new short[]{0, 1, 2, 0, 2, 3}; // The order of vertexrendering.
 
@@ -222,21 +226,21 @@ public class ReinierGLRenderer implements GLSurfaceView.Renderer {
         drawListBuffer.position(0);
     }
 
-    public void translateSprite() {
-        vertices = new float[] {
-            rect.left, rect.top, 0.0f,
-            rect.left, rect.bottom, 0.0f,
-            rect.right, rect.bottom, 0.0f,
-            rect.right, rect.top, 0.0f,
-        };
-
-        // The vertex buffer
-        ByteBuffer bb = ByteBuffer.allocateDirect(vertices.length * 4);
-        bb.order(ByteOrder.nativeOrder());
-        vertexBuffer = bb.asFloatBuffer();
-        vertexBuffer.put(vertices);
-        vertexBuffer.position(0);
-    }
+//    public void translateSprite() {
+//        vertices = new float[] {
+//            rect.left, rect.top, 0.0f,
+//            rect.left, rect.bottom, 0.0f,
+//            rect.right, rect.bottom, 0.0f,
+//            rect.right, rect.top, 0.0f,
+//        };
+//
+//        // The vertex buffer
+//        ByteBuffer bb = ByteBuffer.allocateDirect(vertices.length * 4);
+//        bb.order(ByteOrder.nativeOrder());
+//        vertexBuffer = bb.asFloatBuffer();
+//        vertexBuffer.put(vertices);
+//        vertexBuffer.position(0);
+//    }
 
     public void setupImage() {
         // Create our UV coordinates
@@ -285,15 +289,15 @@ public class ReinierGLRenderer implements GLSurfaceView.Renderer {
 
     public void processTouchEvent(MotionEvent event) {
         // Get the half of screen value
-        int screenahlfX = (int) (screenWidth / 2);
-//        int screenhalfY = (int) (screenHeight / 2);
-        if (event.getX() < screenahlfX) {
-            rect.left -= 10;
-            rect.right -= 10;
-        } else {
-            rect.left += 10;
-            rect.right += 10;
-        }
+        int screenahlf = (int) (screenWidth / 2);
+        int screenheightpart = (int) (screenHeight / 3);
+//        if (event.getX() < screenahlfX) {
+//            rect.left -= 10;
+//            rect.right -= 10;
+//        } else {
+//            rect.left += 10;
+//            rect.right += 10;
+//        }
 
 //        if (event.getY() > screenhalfY) {
 //            rect.top -= 10;
@@ -304,6 +308,38 @@ public class ReinierGLRenderer implements GLSurfaceView.Renderer {
 //        }
 
         // Update the new data
-        translateSprite();
+//        translateSprite();
+
+        if (event.getX() < screenahlf) {
+            // Left screen touch
+            if (event.getY() < screenheightpart) {
+                sprite.scale(-0.01f);
+            } else if (event.getY() < (screenheightpart * 2)) {
+                sprite.translate(-10f, -10f);
+            } else {
+                sprite.rotate(0.01f);
+            }
+        } else {
+            // Right screen touch
+            if (event.getY() < screenheightpart) {
+                sprite.scale(0.01f);
+            } else if (event.getY() < (screenheightpart * 2)) {
+                sprite.translate(10f, 10f);
+            } else {
+                sprite.rotate(-0.01f);
+            }
+        }
+    }
+
+    public void updateSprite() {
+        // Get new transformed vertices
+        vertices = sprite.getTransformedVertices();
+
+        // The vertex buffer
+        ByteBuffer bb = ByteBuffer.allocateDirect(vertices.length * 4);
+        bb.order(ByteOrder.nativeOrder());
+        vertexBuffer = bb.asFloatBuffer();
+        vertexBuffer.put(vertices);
+        vertexBuffer.position(0);
     }
 }
