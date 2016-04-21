@@ -13,7 +13,7 @@ import android.view.WindowManager;
 import com.reanstudio.imagefilter.mesh.SimplePlane;
 import com.reanstudio.imagefilter.renderer.MeshRenderer;
 
-public class MainActivity extends AppCompatActivity {
+public class JaywayMainActivity extends AppCompatActivity {
 
     private GLSurfaceView glSurfaceView;
     private GLSurfaceView glView;
