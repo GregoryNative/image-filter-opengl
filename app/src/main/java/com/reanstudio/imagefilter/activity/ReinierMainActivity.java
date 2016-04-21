@@ -1,4 +1,4 @@
-package com.reanstudio.imagefilter;
+package com.reanstudio.imagefilter.activity;
 
 import android.app.Activity;
 import android.opengl.GLSurfaceView;
@@ -6,6 +6,9 @@ import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
+
+import com.reanstudio.imagefilter.R;
+import com.reanstudio.imagefilter.surface.ReinierGLSurfaceView;
 
 /**
  * Created by yahyamukhlis on 4/19/16.

@@ -1,4 +1,4 @@
-package com.reanstudio.imagefilter;
+package com.reanstudio.imagefilter.activity;
 
 import android.app.ActivityManager;
 import android.content.Context;
@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.reanstudio.imagefilter.R;
 import com.reanstudio.imagefilter.mesh.SimplePlane;
 import com.reanstudio.imagefilter.renderer.MeshRenderer;
 

@@ -1,4 +1,4 @@
-package com.reanstudio.imagefilter;
+package com.reanstudio.imagefilter.surface;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
