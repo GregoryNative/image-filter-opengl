@@ -3,10 +3,12 @@ package com.reanstudio.imagefilter.renderer;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Rect;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
+import android.view.MotionEvent;
 
 import com.reanstudio.imagefilter.shader.ReinierGraphicTools;
 
@@ -44,6 +46,8 @@ public class ReinierGLRenderer implements GLSurfaceView.Renderer {
     private long lastTime;
     private int program;
 
+    public Rect rect;
+
     public ReinierGLRenderer(Context context) {
         this.context = context;
         lastTime = System.currentTimeMillis() + 100;
@@ -61,9 +65,9 @@ public class ReinierGLRenderer implements GLSurfaceView.Renderer {
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 
         // Create the triangle
-        SetupTriangle();
+        setupTriangle();
         // Create the image information
-        SetupImage();
+        setupImage();
 
         // Set the clear color to black
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1);
@@ -185,7 +189,14 @@ public class ReinierGLRenderer implements GLSurfaceView.Renderer {
         GLES20.glDisableVertexAttribArray(texCoordLoc);
     }
 
-    public void SetupTriangle() {
+    public void setupTriangle() {
+        // Initial rect
+        rect = new Rect();
+        rect.left = 10;
+        rect.right = 100;
+        rect.bottom = 100;
+        rect.top = 200;
+
         // We have to create the vertices of our triangle.
         vertices = new float[] {
             10.0f, 200f, 0.0f,
@@ -211,7 +222,23 @@ public class ReinierGLRenderer implements GLSurfaceView.Renderer {
         drawListBuffer.position(0);
     }
 
-    public void SetupImage() {
+    public void translateSprite() {
+        vertices = new float[] {
+            rect.left, rect.top, 0.0f,
+            rect.left, rect.bottom, 0.0f,
+            rect.right, rect.bottom, 0.0f,
+            rect.right, rect.top, 0.0f,
+        };
+
+        // The vertex buffer
+        ByteBuffer bb = ByteBuffer.allocateDirect(vertices.length * 4);
+        bb.order(ByteOrder.nativeOrder());
+        vertexBuffer = bb.asFloatBuffer();
+        vertexBuffer.put(vertices);
+        vertexBuffer.position(0);
+    }
+
+    public void setupImage() {
         // Create our UV coordinates
         uvs = new float[] {
             0.0f, 0.0f,
@@ -254,5 +281,29 @@ public class ReinierGLRenderer implements GLSurfaceView.Renderer {
 
         // We are done using the bitmap so we should recycle it
         bitmap.recycle();
+    }
+
+    public void processTouchEvent(MotionEvent event) {
+        // Get the half of screen value
+        int screenahlfX = (int) (screenWidth / 2);
+//        int screenhalfY = (int) (screenHeight / 2);
+        if (event.getX() < screenahlfX) {
+            rect.left -= 10;
+            rect.right -= 10;
+        } else {
+            rect.left += 10;
+            rect.right += 10;
+        }
+
+//        if (event.getY() > screenhalfY) {
+//            rect.top -= 10;
+//            rect.bottom -= 10;
+//        } else {
+//            rect.top += 10;
+//            rect.bottom += 10;
+//        }
+
+        // Update the new data
+        translateSprite();
     }
 }

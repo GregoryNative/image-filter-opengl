@@ -2,6 +2,7 @@ package com.reanstudio.imagefilter.surface;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
+import android.view.MotionEvent;
 
 import com.reanstudio.imagefilter.renderer.ReinierGLRenderer;
 
@@ -36,5 +37,11 @@ public class ReinierGLSurfaceView extends GLSurfaceView {
     public void onResume() {
         super.onResume();
         glRenderer.onResume();
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        glRenderer.processTouchEvent(event);
+        return true;
     }
 }
