@@ -11,6 +11,8 @@ import android.view.MotionEvent;
 
 import com.reanstudio.imagefilter.shader.ReinierGraphicTools;
 import com.reanstudio.imagefilter.shape.Sprite;
+import com.reanstudio.imagefilter.shape.TextManager;
+import com.reanstudio.imagefilter.shape.TextObject;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -54,6 +56,7 @@ public class ReinierGLRenderer implements GLSurfaceView.Renderer {
 
 //    public Rect rect;
     public Sprite sprite;
+    public TextManager tm;
 
     public ReinierGLRenderer(Context context) {
         this.context = context;
@@ -76,6 +79,8 @@ public class ReinierGLRenderer implements GLSurfaceView.Renderer {
         setupTriangle();
         // Create the image information
         setupImage();
+        // Create our texts
+        setupText();
 
         // Set the clear color to black
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1);
@@ -104,6 +109,17 @@ public class ReinierGLRenderer implements GLSurfaceView.Renderer {
         GLES20.glAttachShader(ReinierGraphicTools.SP_IMAGE, vertexShader);
         GLES20.glAttachShader(ReinierGraphicTools.SP_IMAGE, fragmentShader);
         GLES20.glLinkProgram(ReinierGraphicTools.SP_IMAGE);
+
+        // Text shader
+        int vshadert = ReinierGraphicTools.loadShader(GLES20.GL_VERTEX_SHADER,
+                ReinierGraphicTools.VS_TEXT);
+        int fshadert = ReinierGraphicTools.loadShader(GLES20.GL_FRAGMENT_SHADER,
+                ReinierGraphicTools.FS_TEXT);
+
+        ReinierGraphicTools.SP_TEXT = GLES20.glCreateProgram();
+        GLES20.glAttachShader(ReinierGraphicTools.SP_TEXT, vshadert);
+        GLES20.glAttachShader(ReinierGraphicTools.SP_TEXT, fshadert);
+        GLES20.glLinkProgram(ReinierGraphicTools.SP_TEXT);
 
         // Set our shader programm
         GLES20.glUseProgram(ReinierGraphicTools.SP_IMAGE);
@@ -155,11 +171,18 @@ public class ReinierGLRenderer implements GLSurfaceView.Renderer {
         // Render our example
         draw(trxProjectionAndView);
 
+        // Render the text
+        if(tm!=null)
+            tm.draw(trxProjectionAndView);
+
         // Save the current time to see how long it took :).
         lastTime = now;
     }
 
     private void draw(float[] m) {
+        // Set our shaderprogram to image shader
+        GLES20.glUseProgram(ReinierGraphicTools.SP_IMAGE);
+
         // clear Screen and Depth Buffer, we have set the clear color as black.
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -341,8 +364,8 @@ public class ReinierGLRenderer implements GLSurfaceView.Renderer {
         uvBuffer.position(0);
 
         // Generate textures, if more needed, alter these number
-        int[] texturenames = new int[1];
-        GLES20.glGenTextures(1, texturenames, 0);
+        int[] texturenames = new int[2];
+        GLES20.glGenTextures(2, texturenames, 0);
 
         // Retrieve our image from resources
         int id = context.getResources().getIdentifier("drawable/textureatlas", null,
@@ -362,6 +385,23 @@ public class ReinierGLRenderer implements GLSurfaceView.Renderer {
         // Set wrapping mode
 //        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
 //        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+
+        // Load the bitmap into the bound texture
+        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
+
+        // We are done using the bitmap so we should recycle it
+        bitmap.recycle();
+
+        // Again for the text texture
+        id = context.getResources().getIdentifier("drawable/font", null,
+                context.getPackageName());
+        bitmap = BitmapFactory.decodeResource(context.getResources(), id);
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE0 + 1);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texturenames[1]);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER,
+                GLES20.GL_LINEAR);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER,
+                GLES20.GL_LINEAR);
 
         // Load the bitmap into the bound texture
         GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
@@ -441,5 +481,26 @@ public class ReinierGLRenderer implements GLSurfaceView.Renderer {
         } else {
             ssu = ssx;
         }
+    }
+
+    public void setupText()
+    {
+        // Create our text manager
+        tm = new TextManager();
+
+        // Tell our text manager to use index 1 of textures loaded
+        tm.setTextureID(1);
+
+        // Pass the uniform scale
+        tm.setUniformscale(ssu);
+
+        // Create our new textobject
+        TextObject txt = new TextObject("Hello world", 10f, 10f);
+
+        // Add it to our manager
+        tm.addText(txt);
+
+        // Prepare the text for rendering
+        tm.prepareDraw();
     }
 }
