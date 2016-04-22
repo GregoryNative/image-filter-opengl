@@ -13,12 +13,12 @@ public class Sprite {
     private RectF base;
     private PointF translation;
 
-    public Sprite() {
+    public Sprite(float ssu) {
         // Initialise our initial size around the 0,0 point
-        base = new RectF(-50f, 50f, 50f, -50f);
+        base = new RectF(-50f * ssu, 50f * ssu, 50f * ssu, -50f * ssu);
 
         // Initial translation
-        translation = new PointF(50f, 50f);
+        translation = new PointF(50f * ssu, 50f * ssu);
 
         // We start with our initial size
         scale = 1f;

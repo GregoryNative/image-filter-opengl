@@ -41,6 +41,11 @@ public class ReinierGLRenderer implements GLSurfaceView.Renderer {
     // Our screen resolution
     float screenWidth = 1280;
     float screenHeight = 768;
+    float ssu = 1.0f;
+    float ssx = 1.0f;
+    float ssy = 1.0f;
+    float swp = 320.0f;
+    float shp = 480.0f;
 
     private Context context;
     private long lastTime;
@@ -64,7 +69,8 @@ public class ReinierGLRenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-
+        // Setup our scaling system
+        setupScaling();
         // Create the triangle
         setupTriangle();
         // Create the image information
@@ -198,7 +204,7 @@ public class ReinierGLRenderer implements GLSurfaceView.Renderer {
 //        rect.right = 100;
 //        rect.bottom = 100;
 //        rect.top = 200;
-        sprite = new Sprite();
+        sprite = new Sprite(ssu);
         vertices = sprite.getTransformedVertices();
 
         // We have to create the vertices of our triangle.
@@ -315,7 +321,7 @@ public class ReinierGLRenderer implements GLSurfaceView.Renderer {
             if (event.getY() < screenheightpart) {
                 sprite.scale(-0.01f);
             } else if (event.getY() < (screenheightpart * 2)) {
-                sprite.translate(-10f, -10f);
+                sprite.translate(-10f * ssu, -10f * ssu);
             } else {
                 sprite.rotate(0.01f);
             }
@@ -324,7 +330,7 @@ public class ReinierGLRenderer implements GLSurfaceView.Renderer {
             if (event.getY() < screenheightpart) {
                 sprite.scale(0.01f);
             } else if (event.getY() < (screenheightpart * 2)) {
-                sprite.translate(10f, 10f);
+                sprite.translate(10f * ssu, 10f * ssu);
             } else {
                 sprite.rotate(-0.01f);
             }
@@ -341,5 +347,22 @@ public class ReinierGLRenderer implements GLSurfaceView.Renderer {
         vertexBuffer = bb.asFloatBuffer();
         vertexBuffer.put(vertices);
         vertexBuffer.position(0);
+    }
+
+    public void setupScaling() {
+        // The screen resolutions
+        swp = (int) (context.getResources().getDisplayMetrics().widthPixels);
+        shp = (int) (context.getResources().getDisplayMetrics().heightPixels);
+
+        // Orientation is assumed potrait
+        ssx = swp / 320.0f;
+        ssy = shp / 480.0f;
+
+        // Get our uniform scaler
+        if (ssx > ssy) {
+            ssu = ssy;
+        } else {
+            ssu = ssx;
+        }
     }
 }
