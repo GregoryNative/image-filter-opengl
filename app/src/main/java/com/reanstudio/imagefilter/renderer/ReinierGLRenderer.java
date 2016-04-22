@@ -16,6 +16,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
+import java.util.Random;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -79,6 +80,9 @@ public class ReinierGLRenderer implements GLSurfaceView.Renderer {
         // Set the clear color to black
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1);
 
+        GLES20.glEnable(GLES20.GL_BLEND);
+        GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+
         // Create the shaders
         int vertexShader = ReinierGraphicTools.loadShader(GLES20.GL_VERTEX_SHADER,
                 ReinierGraphicTools.VS_SOLID_COLOR);
@@ -129,6 +133,9 @@ public class ReinierGLRenderer implements GLSurfaceView.Renderer {
 
         // Calculate the projection and view transformation
         Matrix.multiplyMM(trxProjectionAndView, 0, trxProjection, 0, trxView, 0);
+
+        // setup our scaling system
+        setupScaling();
     }
 
     @Override
@@ -143,7 +150,7 @@ public class ReinierGLRenderer implements GLSurfaceView.Renderer {
         long elapsed = now - lastTime;
 
         // Update our example
-        updateSprite();
+//        updateSprite();
 
         // Render our example
         draw(trxProjectionAndView);
@@ -155,30 +162,26 @@ public class ReinierGLRenderer implements GLSurfaceView.Renderer {
     private void draw(float[] m) {
         // clear Screen and Depth Buffer, we have set the clear color as black.
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
+        GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
         // get handle to vertex shader's vPosition member
         int mPositionHandle = GLES20.glGetAttribLocation(ReinierGraphicTools.SP_SOLID_COLOR, "vPosition");
-
-        // Enable generic vertex attribute array
-        GLES20.glEnableVertexAttribArray(mPositionHandle);
-
         // Prepare the triangle coordinate data
         GLES20.glVertexAttribPointer(mPositionHandle, 3,
                 GLES20.GL_FLOAT, false,
                 0, vertexBuffer);
+        // Enable generic vertex attribute array
+        GLES20.glEnableVertexAttribArray(mPositionHandle);
 
-        // Get habdle to texture coordinates location
+        // Get handle to texture coordinates location
         int texCoordLoc = GLES20.glGetAttribLocation(ReinierGraphicTools.SP_IMAGE, "a_texCoord");
-
+        // Prepare the texturecoordinates
+        GLES20.glVertexAttribPointer(texCoordLoc, 2, GLES20.GL_FLOAT, false, 0, uvBuffer);
         // Enable generic vertex attribute array
         GLES20.glEnableVertexAttribArray(texCoordLoc);
 
-        // Prepare the texturecoordinates
-        GLES20.glVertexAttribPointer(texCoordLoc, 2, GLES20.GL_FLOAT, false, 0, uvBuffer);
-
         // Get handle to shape's transformation matrix
         int mtrxhandle = GLES20.glGetUniformLocation(ReinierGraphicTools.SP_SOLID_COLOR, "uMVPMatrix");
-
         // Apply the projection and view transformation
         GLES20.glUniformMatrix4fv(mtrxhandle, 1, false, m, 0);
 
@@ -204,8 +207,9 @@ public class ReinierGLRenderer implements GLSurfaceView.Renderer {
 //        rect.right = 100;
 //        rect.bottom = 100;
 //        rect.top = 200;
-        sprite = new Sprite(ssu);
-        vertices = sprite.getTransformedVertices();
+
+//        sprite = new Sprite(ssu);
+//        vertices = sprite.getTransformedVertices();
 
         // We have to create the vertices of our triangle.
 //        vertices = new float[] {
@@ -215,7 +219,54 @@ public class ReinierGLRenderer implements GLSurfaceView.Renderer {
 //            100f, 200f, 0.0f,
 //        };
 
-        indices = new short[]{0, 1, 2, 0, 2, 3}; // The order of vertexrendering.
+        // The order of vertexrendering.
+//        indices = new short[]{0, 1, 2, 0, 2, 3};
+
+        // We will need a randomizer
+        Random rnd = new Random();
+
+        // Our collection of vertices
+        vertices = new float[30*4*3];
+
+        // Create the vertex data
+        for(int i=0;i<30;i++)
+        {
+            int offset_x = rnd.nextInt((int)swp);
+            int offset_y = rnd.nextInt((int)shp);
+
+            // Create the 2D parts of our 3D vertices, others are default 0.0f
+            vertices[(i*12) + 0] = offset_x;
+            vertices[(i*12) + 1] = offset_y + (30.0f*ssu);
+            vertices[(i*12) + 2] = 0f;
+            vertices[(i*12) + 3] = offset_x;
+            vertices[(i*12) + 4] = offset_y;
+            vertices[(i*12) + 5] = 0f;
+            vertices[(i*12) + 6] = offset_x + (30.0f*ssu);
+            vertices[(i*12) + 7] = offset_y;
+            vertices[(i*12) + 8] = 0f;
+            vertices[(i*12) + 9] = offset_x + (30.0f*ssu);
+            vertices[(i*12) + 10] = offset_y + (30.0f*ssu);
+            vertices[(i*12) + 11] = 0f;
+        }
+
+        // The indices for all textured quads
+        indices = new short[30*6];
+        int last = 0;
+        for(int i=0;i<30;i++)
+        {
+            // We need to set the new indices for the new quad
+            indices[(i*6) + 0] = (short) (last + 0);
+            indices[(i*6) + 1] = (short) (last + 1);
+            indices[(i*6) + 2] = (short) (last + 2);
+            indices[(i*6) + 3] = (short) (last + 0);
+            indices[(i*6) + 4] = (short) (last + 2);
+            indices[(i*6) + 5] = (short) (last + 3);
+
+            // Our indices are connected to the vertices so we need to keep them
+            // in the correct order.
+            // normal quad = 0,1,2,0,2,3 so the next one will be 4,5,6,4,6,7
+            last = last + 4;
+        }
 
         // The vertex buffer.
         ByteBuffer bb = ByteBuffer.allocateDirect(vertices.length * 4);
@@ -249,13 +300,38 @@ public class ReinierGLRenderer implements GLSurfaceView.Renderer {
 //    }
 
     public void setupImage() {
-        // Create our UV coordinates
-        uvs = new float[] {
-            0.0f, 0.0f,
-            0.0f, 1.0f,
-            1.0f, 1.0f,
-            1.0f, 0.0f,
-        };
+//        // Create our UV coordinates
+//        uvs = new float[] {
+//            0.0f, 0.0f,
+//            0.0f, 1.0f,
+//            1.0f, 1.0f,
+//            1.0f, 0.0f,
+//        };
+
+        // We will use a randomizer for randomizing the textures from texture atlas.
+        // This is strictly optional as it only effects the output of our app,
+        // Not the actual knowledge.
+        Random rnd = new Random();
+
+        // 30 imageobjects times 4 vertices times (u and v)
+        uvs = new float[30*4*2];
+
+        // We will make 30 randomly textures objects
+        for(int i=0; i<30; i++)
+        {
+            int random_u_offset = rnd.nextInt(2);
+            int random_v_offset = rnd.nextInt(2);
+
+            // Adding the UV's using the offsets
+            uvs[(i*8) + 0] = random_u_offset * 0.5f;
+            uvs[(i*8) + 1] = random_v_offset * 0.5f;
+            uvs[(i*8) + 2] = random_u_offset * 0.5f;
+            uvs[(i*8) + 3] = (random_v_offset+1) * 0.5f;
+            uvs[(i*8) + 4] = (random_u_offset+1) * 0.5f;
+            uvs[(i*8) + 5] = (random_v_offset+1) * 0.5f;
+            uvs[(i*8) + 6] = (random_u_offset+1) * 0.5f;
+            uvs[(i*8) + 7] = random_v_offset * 0.5f;
+        }
 
         // The texture buffer
         ByteBuffer bb = ByteBuffer.allocateDirect(uvs.length * 4);
@@ -269,7 +345,8 @@ public class ReinierGLRenderer implements GLSurfaceView.Renderer {
         GLES20.glGenTextures(1, texturenames, 0);
 
         // Retrieve our image from resources
-        int id = context.getResources().getIdentifier("drawable/jay", null, context.getPackageName());
+        int id = context.getResources().getIdentifier("drawable/textureatlas", null,
+                context.getPackageName());
 
         // Temporary create a bitmap
         Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), id);
@@ -283,8 +360,8 @@ public class ReinierGLRenderer implements GLSurfaceView.Renderer {
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
 
         // Set wrapping mode
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+//        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+//        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
 
         // Load the bitmap into the bound texture
         GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
@@ -316,25 +393,25 @@ public class ReinierGLRenderer implements GLSurfaceView.Renderer {
         // Update the new data
 //        translateSprite();
 
-        if (event.getX() < screenahlf) {
-            // Left screen touch
-            if (event.getY() < screenheightpart) {
-                sprite.scale(-0.01f);
-            } else if (event.getY() < (screenheightpart * 2)) {
-                sprite.translate(-10f * ssu, -10f * ssu);
-            } else {
-                sprite.rotate(0.01f);
-            }
-        } else {
-            // Right screen touch
-            if (event.getY() < screenheightpart) {
-                sprite.scale(0.01f);
-            } else if (event.getY() < (screenheightpart * 2)) {
-                sprite.translate(10f * ssu, 10f * ssu);
-            } else {
-                sprite.rotate(-0.01f);
-            }
-        }
+//        if (event.getX() < screenahlf) {
+//            // Left screen touch
+//            if (event.getY() < screenheightpart) {
+//                sprite.scale(-0.01f);
+//            } else if (event.getY() < (screenheightpart * 2)) {
+//                sprite.translate(-10f * ssu, -10f * ssu);
+//            } else {
+//                sprite.rotate(0.01f);
+//            }
+//        } else {
+//            // Right screen touch
+//            if (event.getY() < screenheightpart) {
+//                sprite.scale(0.01f);
+//            } else if (event.getY() < (screenheightpart * 2)) {
+//                sprite.translate(10f * ssu, 10f * ssu);
+//            } else {
+//                sprite.rotate(-0.01f);
+//            }
+//        }
     }
 
     public void updateSprite() {
