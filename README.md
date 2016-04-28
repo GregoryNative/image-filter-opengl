@@ -1,5 +1,5 @@
 # image-filter-opengl
-Image Filter using OpenGL
+Learning basic OpenGL to create sample apps Image Filter.
 
 # Reference
 http://www.jayway.com/author/pererikbergman/ <br />
