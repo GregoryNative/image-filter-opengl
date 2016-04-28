@@ -1,11 +1,11 @@
 package com.reanstudio.imagefilter.activity;
 
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.ConfigurationInfo;
 import android.graphics.BitmapFactory;
 import android.opengl.GLSurfaceView;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
@@ -14,9 +14,8 @@ import com.reanstudio.imagefilter.R;
 import com.reanstudio.imagefilter.mesh.SimplePlane;
 import com.reanstudio.imagefilter.renderer.MeshRenderer;
 
-public class JaywayMainActivity extends AppCompatActivity {
+public class JaywayMainActivity extends Activity {
 
-    private GLSurfaceView glSurfaceView;
     private GLSurfaceView glView;
 
     @Override
@@ -31,8 +30,8 @@ public class JaywayMainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (glSurfaceView != null) {
-            glSurfaceView.onResume();
+        if (glView != null) {
+            glView.onResume();
         }
 
     }
@@ -40,8 +39,8 @@ public class JaywayMainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        if (glSurfaceView != null) {
-            glSurfaceView.onPause();
+        if (glView != null) {
+            glView.onPause();
         }
     }
 

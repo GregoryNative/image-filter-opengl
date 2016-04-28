@@ -28,13 +28,13 @@ public class ReinierMainActivity extends Activity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         // Set our view
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_reinier);
 
         // We create our Surfaceview for our OpenGL here
         glSurfaceView = new ReinierGLSurfaceView(this);
         RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
-        RelativeLayout.LayoutParams glParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
-                RelativeLayout.LayoutParams.MATCH_PARENT);
+        RelativeLayout.LayoutParams glParams = new RelativeLayout.LayoutParams
+                (RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
         layout.addView(glSurfaceView, glParams);
     }
 

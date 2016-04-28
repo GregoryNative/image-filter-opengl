@@ -10,7 +10,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.LessonEightActivity">
+        <activity android:name=".activity.MainActivity" android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -35,6 +35,8 @@
         <activity android:name=".activity.LessonSixActivity" />
 
         <activity android:name=".activity.LessonSevenActivity" />
+
+        <activity android:name=".activity.LessonEightActivity" />
     </application>
 
 </manifest>

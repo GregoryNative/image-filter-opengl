@@ -25,4 +25,15 @@
     <string name="lesson_seven_not_using_stride">Not using stride</string>
     <string name="lesson_eight_error_could_not_create_vbo">Could not create vertex buffer object: %s</string>
     <string name="lesson_eight_error_unknown">Unknown error: %s</string>
+
+    <string name="jayway_tutorial">Jayway Tutorial</string>
+    <string name="reinier_tutorial">Reinier Tutorial</string>
+    <string name="lesson_one">Lesson 1</string>
+    <string name="lesson_two">Lesson 2</string>
+    <string name="lesson_three">Lesson 3</string>
+    <string name="lesson_four">Lesson 4</string>
+    <string name="lesson_five">Lesson 5</string>
+    <string name="lesson_six">Lesson 6</string>
+    <string name="lesson_seven">Lesson 7</string>
+    <string name="lesson_eight">Lesson 8</string>
 </resources>

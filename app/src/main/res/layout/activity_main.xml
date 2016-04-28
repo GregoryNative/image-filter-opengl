@@ -1,8 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:id="@+id/layout">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:id="@+id/layout"
+    android:padding="10dp">
 
-</RelativeLayout>
+    <Button
+        android:id="@+id/btn_reinier"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/reinier_tutorial" />
+
+    <Button
+        android:id="@+id/btn_jayway"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/jayway_tutorial" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Learn OpenGL ES 2.0"
+        android:textAlignment="center"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp"
+        android:textSize="24sp"
+        android:id="@+id/textView" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="4">
+
+        <Button
+            android:id="@+id/btn_lesson_one"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/lesson_one"
+            android:layout_weight="1"/>
+
+        <Button
+            android:id="@+id/btn_lesson_two"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/lesson_two"
+            android:layout_weight="1"/>
+
+        <Button
+            android:id="@+id/btn_lesson_three"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/lesson_three"
+            android:layout_weight="1"/>
+
+        <Button
+            android:id="@+id/btn_lesson_four"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/lesson_four"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="4">
+
+        <Button
+            android:id="@+id/btn_lesson_five"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/lesson_five"
+            android:layout_weight="1"/>
+
+        <Button
+            android:id="@+id/btn_lesson_six"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/lesson_six"
+            android:layout_weight="1"/>
+
+        <Button
+            android:id="@+id/btn_lesson_seven"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/lesson_seven"
+            android:layout_weight="1"/>
+
+        <Button
+            android:id="@+id/btn_lesson_eight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/lesson_eight"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
+</LinearLayout>
